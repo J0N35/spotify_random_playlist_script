@@ -4,23 +4,20 @@
 ' inspired by 8aller and mrpixeltech on
 'https://community.spotify.com/t5/Desktop-Linux-Windows-Web-Player/Is-there-a-command-to-play-a-playlist-using-command-line/td-p/952251
 
+' TODO: only can play the last playlist, URI only open target playlist
+
 Randomize
-Dim timenow
+Dim timenow, selected_playlist
 ' determine path of spotify
 Const spotify_path = "{}:\Users\{YOUR USER NAME}\AppData\Roaming\Spotify.exe"
-
-' change your favourvite playlist in below (playlist URI)
-Dim selected_playlist
-' TODO: need better method to play specfic playlist
-' get current time
-timenow = Hour(Now())
 
 Function selectPlaylist()
 	Dim range, min, which
 	' random number 1-4
 	range = 4
 	min = 1
-	which = Int((range-min+1) * Rnd() + min)
+	which = Int((range - min + 1) * Rnd() + min)
+	' change your favourvite playlist in below (playlist URI)
 	Select Case which
 		Case 1
 			' weekly discovery
@@ -44,22 +41,24 @@ Function startSpotifly()
 	selected_playlist = selectPlaylist() ' random select playlist
 	Set WshShell = WScript.CreateObject("WScript.Shell")
 	WshShell.Run(selected_playlist)
-	WScript.sleep 10000 'extra time delay for potential update
-	' focus song in playlist by searching playlist
+	' extra time delay for potential update
+	WScript.sleep 10000
+	' trigger focus on song in playlist by searching playlist
 	WshShell.SendKeys "^f"
-	WScript.sleep 100
+	WScript.sleep 200
 	' escape the search
 	WshShell.SendKeys "{ESC}"
-	WScript.sleep 100
+	WScript.sleep 200
 	' select a song to play by select all songs
 	WshShell.SendKeys "^a"
-	WScript.sleep 100
+	WScript.sleep 200
 	' select one song
 	WshShell.SendKeys "{UP}"
-	WScript.sleep 100
-	' play song from start
+	WScript.sleep 200
+	' play song in playlist
 	WshShell.SendKeys "{ENTER}"
 	WScript.sleep 100
+	' play song in shuffle
 	WshShell.SendKeys "^{RIGHT}"
 End Function
 
@@ -68,6 +67,8 @@ Function stopSpotifly()
 	WshShell.Run("TASKKILL /IM Spotify.exe")
 End Function
 
+' get current time
+timenow = Hour(Now())
 If (timenow < 12) Then
 	' if it is morning
 	startSpotifly()
